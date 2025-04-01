@@ -13,6 +13,7 @@ import AddRecipe from "./pages/AddRecipe";
 import Recipes from "./pages/recipePage";
 import Logout from "./pages/logout";
 import Home from "./pages/Home";
+import Favorites from "./components/Favorites";
 
 
 function App() {
@@ -22,7 +23,7 @@ function App() {
     <Navibar/>
       <Routes>
                 <Route exact path="/home" element={<Home />} />
-                <Route path="/favorites" element={<Recipes />} />
+                <Route path="/favorites" element={<Favorites />} />
               
                 <Route
                     path="/login"

@@ -11,12 +11,9 @@ function authenticateToken(req, res, next) {
         return res.status(401).json({ message: "Juurdepääs keelatud! Puudub token." });
     }
 
-    jwt.verify(token, SECRET_KEY, (err, user) => {
-        if (err) {
-            return res.status(403).json({ message: "Vale või aegunud token!" });
-        }
-        console.log("Decoded user from token:", user); // ⬅️ Kontrollime, mis andmed tulevad!
-        req.user = user; // Lisame kasutaja info (id, email)
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) return res.status(403).json({ message: "Invalid Token" });
+        req.user = user; 
         next();
     });
 }

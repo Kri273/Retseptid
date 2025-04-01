@@ -28,6 +28,7 @@ const handleSubmit = async (event) => {
       if (response.data.token && response.data.username) {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("username", response.data.username);
+        localStorage.setItem("userId", response.data.userId);
         setMessage("Login successful! Token saved.");
         navigate("/home");
         window.location.reload();

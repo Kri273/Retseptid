@@ -10,6 +10,7 @@ const bcrypt = require("bcrypt");
 const app = express();
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 const db = mysql.createConnection({
   host: "localhost",
@@ -66,7 +67,8 @@ app.post("/login", (req, res) => {
       return res.json({
         message: "Login successful",
         token,
-        username: user.kasutajanimi, 
+        userId: user.id,
+        username: user.kasutajanimi,
       });
     } else {
       return res.status(401).json({ message: "Invalid email or password" });
@@ -74,34 +76,34 @@ app.post("/login", (req, res) => {
   });
 });
 
-
 app.post("/sign-up", async (req, res) => {
-  const { email, password, kasutajanimi } = req.body; 
+  const { email, password, kasutajanimi } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ message: "Email ja parool on kohustuslikud!" });
+    return res
+      .status(400)
+      
+      .json({ message: "Email ja parool on kohustuslikud!" });
   }
 
-  // If kasutajanimi is not provided or empty, generate it from email
-  let finalUsername = kasutajanimi && kasutajanimi.trim() !== "" 
-    ? kasutajanimi 
-    : email.split("@")[0];
+  let finalUsername =
+    kasutajanimi && kasutajanimi.trim() !== ""
+      ? kasutajanimi
+      : email.split("@")[0];
 
   try {
-    // Generate a unique username (assuming this function exists)
     finalUsername = await generateUniqueUsername(finalUsername);
-
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Corrected SQL query with matching parameter order
-    const sql = "INSERT INTO kasutajad (email, password, kasutajanimi) VALUES (?, ?, ?)";
+    const sql =
+      "INSERT INTO kasutajad (email, password, kasutajanimi) VALUES (?, ?, ?)";
     db.query(sql, [email, hashedPassword, finalUsername], (err, result) => {
       if (err) {
         console.error("Database error:", err);
         return res.status(500).json({ message: "Midagi läks valesti" });
       }
-      res.status(201).json({ message: "Kasutaja loodud!", kasutajanimi: finalUsername });
+      res
+        .status(201)
+        .json({ message: "Kasutaja loodud!", kasutajanimi: finalUsername });
     });
   } catch (err) {
     console.error("Error during sign-up:", err);
@@ -109,7 +111,6 @@ app.post("/sign-up", async (req, res) => {
   }
 });
 
-// Update username route
 app.post("/update-username", (req, res) => {
   const { userId, newUsername } = req.body;
 
@@ -140,7 +141,6 @@ app.post("/update-username", (req, res) => {
   });
 });
 
-// Example implementation of generateUniqueUsername (adjust as needed)
 async function generateUniqueUsername(baseUsername) {
   let username = baseUsername;
   let counter = 1;
@@ -153,9 +153,9 @@ async function generateUniqueUsername(baseUsername) {
         (err, result) => {
           if (err) return reject(err);
           if (result[0].count === 0) {
-            resolve(username); // Username is unique
+            resolve(username);
           } else {
-            username = `${baseUsername}${counter++}`; // Append number and retry
+            username = `${baseUsername}${counter++}`;
             checkUsername();
           }
         }
@@ -165,7 +165,6 @@ async function generateUniqueUsername(baseUsername) {
   });
 }
 
-// Multer üleslaadimise konfiguratsioon
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/"); // Salvesta pildid 'uploads' kausta
@@ -212,7 +211,7 @@ app.use("/uploads", express.static("uploads"));
 
 app.get("/recipes", (req, res) => {
   const sql =
-    "SELECT r.ret_id, r.name, r.image, r.koostisosad, r.retsept, k.email AS kasutajanimi FROM retseptid r JOIN kasutajad k ON r.id = k.id";
+    "SELECT r.ret_id, r.name, r.image, r.koostisosad, r.retsept, k.kasutajanimi AS kasutajanimi FROM retseptid r JOIN kasutajad k ON r.id = k.id";
 
   db.query(sql, (err, data) => {
     if (err) {
@@ -223,37 +222,72 @@ app.get("/recipes", (req, res) => {
   });
 });
 
+app.post("/favorites/add", authenticateToken, (req, res) => {
+  console.log("Received recipeId:", req.body.recipeId);
+  console.log("Received userId:", req.user?.id); 
+  
+  const recipeId = req.body.recipeId;
+  const userId = req.user?.id; 
 
-app.post("/rate-recipe", authenticateToken, (req, res) => {
-  const { recipeId, rating } = req.body;
-  const userId = req.user.id; 
-
-  if (!recipeId || !rating) {
-    return res.status(400).json({ error: "Puuduv retsepti ID või hinnang" });
+  if (!recipeId || !userId) {
+    return res.status(400).json({ message: "Missing recipe ID or user ID" });
   }
+  console.log(`Adding recipe ${recipeId} to user ${userId}'s favorites`);
+  const sql = `
+  INSERT INTO lemmikud (ret_id, id) 
+  VALUES (?, ?) 
+  ON DUPLICATE KEY UPDATE ret_id = ret_id`;
 
-  const sql =
-    "INSERT INTO hinnangud (recipe_id, user_id, rating) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE rating = VALUES(rating)";
-
-  db.query(sql, [recipeId, userId, rating], (err, data) => {
+  db.query(sql, [recipeId, userId], (err, result) => {
     if (err) {
-      console.error("Viga hinnangu salvestamisel:", err);
-      return res.status(500).json({ error: "Serveri viga" });
+      console.error("Error adding favorite:", err);
+      return res.status(500).json({ message: "Error adding favorite" });
     }
-    res.json({ success: true, message: "Hinnang salvestatud!" });
+    return res.json({ message: "Recipe added to favorites!" });
   });
 });
 
+app.post("/favorites/remove", authenticateToken, (req, res) => {
+  const { recipeId } = req.body;
+  const userId = req.user?.id;
+
+  if (!recipeId) {
+    return res.status(400).json({ message: "Missing recipe ID" });
+  }
+  console.log(`Removing recipe ${recipeId} from user ${userId}'s favorites`);
+
+  const sql = "DELETE FROM lemmikud WHERE id = ? AND ret_id = ?";
+
+  db.query(sql, [userId, recipeId], (err, result) => {
+    if (err) {
+      console.error("Error removing favorite:", err);
+      return res.status(500).json({ message: "Error removing favorite" });
+    }
+    return res.json({ message: "Recipe removed from favorites!" });
+  });
+});
 
 app.get("/favorites", authenticateToken, (req, res) => {
-  const sql = "SELECT * FROM lemmikud WHERE user_email = ?";
-  const userEmail = req.user.email; // Kasutaja email JWT payloadist
+  const userId = req.user?.id;
+  console.log("Received userId:", userId);
 
-  db.query(sql, [userEmail], (err, data) => {
+  if (!userId) {
+    return res.status(400).json({ message: "Missing userId" });
+  }
+
+  console.log(`Fetching favorites for user ${userId}`);
+
+  const sql = `
+    SELECT r.ret_id, r.name, r.image, r.koostisosad, r.retsept 
+    FROM lemmikud l
+    JOIN retseptid r ON l.ret_id = r.ret_id
+    WHERE l.id = ?`;
+
+  db.query(sql, [userId], (err, data) => {
     if (err) {
+      console.error("Error fetching favorites:", err);
       return res.status(500).json({ message: "Error fetching favorites" });
     }
-
     return res.json(data);
   });
 });
