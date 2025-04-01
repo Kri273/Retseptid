@@ -45,7 +45,7 @@ const Favorites = () => {
       );
   
       setFavorites((prevFavorites) =>
-        prevFavorites.filter((fav) => fav.id !== recipeId)
+        prevFavorites.filter((fav) => fav.ret_id !== recipeId)
       );
     } catch (error) {
       console.error("Error removing favorite:", error.response?.data || error);
@@ -58,9 +58,9 @@ const Favorites = () => {
       <h1>Your Favorites</h1>
       <ul>
         {favorites.map((item) => (
-          <li key={item.id}>
+          <li key={item.ret_id}>
             {item.name}
-            <button onClick={() => removeFavorite(item.id)}>Remove</button>
+            <button onClick={() => removeFavorite(item.ret_id)}>Remove</button>
           </li>
         ))}
       </ul>
