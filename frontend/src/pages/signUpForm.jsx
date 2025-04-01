@@ -47,6 +47,7 @@ const SignUp = () => {
         localStorage.setItem("username", loginResponse.data.username);
 
         navigate("/home");
+        window.location.reload();
       } else {
         alert("Login failed after sign-up.");
       }

@@ -3,6 +3,8 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Button from 'react-bootstrap/Button';
+import Tooltip from 'react-bootstrap/Tooltip';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import './navbar.css'
 
 const Navibar = () => {
@@ -31,8 +33,18 @@ const Navibar = () => {
           <Nav>
           <Nav.Link href="home">Avaleht</Nav.Link>
           <Nav.Link href="favorites">Lemmikud</Nav.Link>
+          {isLoggedIn && (
+              <OverlayTrigger
+              placement="bottom"
+              overlay={<Tooltip id="tooltip-add-recipe">Lisa retsept</Tooltip>}
+            >
+              <Button variant="outline-primary" href="add-recipe" className="me-2">
+                +
+              </Button>
+            </OverlayTrigger>
+               )}
             {!isLoggedIn ? (
-                <Button variant="outline-primary" href="login" className="me-2">Login</Button>
+                <Button variant="outline-primary" href="login" className="me-2">Logi sisse</Button>
             ) : (
               <Button variant="danger" onClick={handleLogout}>Logi välja</Button>
             )}

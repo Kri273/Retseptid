@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import "./form.css";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const AddRecipe = ({ onSubmit }) => {
   const [recipe, setRecipe] = useState({
@@ -12,6 +13,8 @@ const AddRecipe = ({ onSubmit }) => {
 
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,7 +54,7 @@ const AddRecipe = ({ onSubmit }) => {
         }
       );
 
-      console.log(res.data);
+      navigate("/home");
     } catch (err) {
       console.log("Error uploading recipe:", err);
       alert("Te ei ole sisse logitud")

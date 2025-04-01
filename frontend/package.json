@@ -10,12 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fortawesome/free-brands-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "axios": "^1.7.9",
     "jwt-decode": "^4.0.0",
     "mysql": "^2.18.1",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",
     "react-dom": "^19.0.0",
+    "react-fontawesome": "^1.7.1",
     "react-heart": "^1.0.6",
     "react-router-dom": "^7.1.5",
     "react-stars": "^2.2.5"

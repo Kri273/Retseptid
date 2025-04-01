@@ -24,7 +24,6 @@ function Card1({
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("userId");
 
-
   useEffect(() => {
     if (!token) return;
 
@@ -49,13 +48,13 @@ function Card1({
       if (isFavorite) {
         await axios.post(
           "http://localhost:8081/favorites/remove",
-          { recipeId: id }, 
+          { recipeId: id },
           { headers: { Authorization: `Bearer ${token}` } }
         );
       } else {
         await axios.post(
           "http://localhost:8081/favorites/add",
-          { recipeId: id }, 
+          { recipeId: id },
           { headers: { Authorization: `Bearer ${token}` } }
         );
       }
@@ -81,14 +80,29 @@ function Card1({
 
   const handleShow = () => setShowModal(true);
   const handleClose = () => setShowModal(false);
-  const [active, setActive] = useState(false);
+
+  const handleCardClick = () => {
+    handleShow();
+  };
 
   return (
     <>
-      <Card style={{ width: "18rem", margin: "10px" }}>
+      <Card
+        style={{
+          width: "18rem",
+          margin: "10px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          border: "none",
+        }}
+        className="favorite-card"
+      >
         <Card.Img
+          onClick={handleCardClick}
           style={{
-            maxWidth: "14rem",
+            cursor: "pointer",
+            maxWidth: "16rem",
             margin: "10px",
             height: "14rem",
             alignSelf: "center",
@@ -102,20 +116,36 @@ function Card1({
           }
           alt={name}
         />
-        <Card.Body>
-          <Card.Title>{name}</Card.Title>
-
-          <div style={{ display: "flex", alignItems: "center" }}>
+        <Card.Body
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexGrow: 1,
+            width: "100%",
+          }}
+        >
+          <Card.Title style={{ textAlign: "center" }}>{name}</Card.Title>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "14px",
+              marginTop: "auto",
+              paddingBottom: "10px",
+            }}
+          >
             <Button variant="primary" onClick={handleShow}>
               Vaata retsepti
             </Button>
             <Heart
               isActive={isFavorite}
               onClick={toggleFavorite}
-              inactiveColor="#ddd"
+              inactiveColor="#fff"
               activeColor="red"
               animationScale={1.25}
-              style={{ height: "2rem", width: "2rem", marginLeft: "14px" }}
+              style={{ height: "2.5rem", width: "2.5rem" }}
             />
           </div>
         </Card.Body>
@@ -130,7 +160,7 @@ function Card1({
           <div className="modal-top">
             <div className="modal-image">
               <Card.Img
-                style={{ padding: "10px" }}
+                style={{ padding: "5px" }}
                 variant="top"
                 src={
                   image

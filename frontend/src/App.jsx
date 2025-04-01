@@ -14,6 +14,7 @@ import Recipes from "./pages/recipePage";
 import Logout from "./pages/logout";
 import Home from "./pages/Home";
 import Favorites from "./components/Favorites";
+import Footer from "./components/footer";
 
 
 function App() {
@@ -43,6 +44,7 @@ function App() {
                 />
             </Routes>
     </Router>
+    <Footer />
     </div>
   );
 }

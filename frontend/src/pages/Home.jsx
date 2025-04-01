@@ -17,7 +17,7 @@ function Home() {
 
   return (
     <div>
-      <h1>Tere, {username}!</h1>
+      <h1 className="tere">Tere, {username}!</h1>
       <div
         style={{
           display: "flex",
