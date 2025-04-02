@@ -6,7 +6,7 @@ Retseptid on veebirakendus, mis võimaldab kasutajatel lisada, vaadata ja salves
 ## Tehnoloogiad
 Projekt kasutab järgmisi tehnoloogiaid:
 
-- **Frontend:** React.js, React Bootstrap
+- **Frontend:** React.js, React-Bootstrap, Bootstrap 
 - **Backend:** Node.js, Express.js, MySQL
 - **Autentimine:** JWT (JSON Web Token)
 - **Failihaldus:** Multer (piltide üleslaadimiseks)
@@ -39,7 +39,7 @@ Projekt kasutab järgmisi tehnoloogiaid:
    - **Frontend:**
      ```sh
      cd frontend
-     npm start
+     npm run dev
      ```
 
 ## Autentimine
