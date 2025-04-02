@@ -1,4 +1,3 @@
-
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import {
@@ -10,7 +9,6 @@ import Navibar from "./components/navbar";
 import LoginForm from "./pages/loginForm";
 import SignUpForm from "./pages/signUpForm";
 import AddRecipe from "./pages/AddRecipe";
-import Recipes from "./pages/recipePage";
 import Logout from "./pages/logout";
 import Home from "./pages/Home";
 import Favorites from "./components/Favorites";

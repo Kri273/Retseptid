@@ -142,7 +142,7 @@ function Card1({
             <Heart
               isActive={isFavorite}
               onClick={toggleFavorite}
-              inactiveColor="#fff"
+              inactiveColor="#ddd"
               activeColor="red"
               animationScale={1.25}
               style={{ height: "2.5rem", width: "2.5rem" }}
@@ -184,13 +184,6 @@ function Card1({
             <p>{retsept}</p>
           </div>
 
-          <ReactStars
-            count={5}
-            value={rating}
-            onChange={handleRatingChange}
-            size={24}
-            activeColor="#FF9529"
-          />
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>

@@ -23,7 +23,7 @@ const SECRET_KEY =
   "27fab2ac4dfdee74fa836b7f25bbe464314f5d7a63b163bcaa3398233efb0bcf3a9e39890fe36f768aaf23ba29a7e76a87ff502ab03efb080cc78b2372dfae8b";
 
 const authenticateToken = (req, res, next) => {
-  // Get token from Authorization header
+ 
   const token =
     req.headers["authorization"] && req.headers["authorization"].split(" ")[1];
 
@@ -33,16 +33,14 @@ const authenticateToken = (req, res, next) => {
       .json({ message: "Access denied, no token provided" });
   }
 
-  // Verify token
   jwt.verify(token, SECRET_KEY, (err, user) => {
     if (err) {
       return res.status(403).json({ message: "Invalid token" });
     }
 
-    // Attach the user data to the request object
     req.user = user;
     console.log(req.user);
-    next(); // Continue to the next middleware or route handler
+    next(); 
   });
 };
 
@@ -167,10 +165,10 @@ async function generateUniqueUsername(baseUsername) {
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Salvesta pildid 'uploads' kausta
+    cb(null, "uploads/"); 
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // Lisa ajatempli pildinimele
+    cb(null, Date.now() + path.extname(file.originalname));
   },
 });
 const upload = multer({ storage });
