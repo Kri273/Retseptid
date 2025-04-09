@@ -1,7 +1,9 @@
 const jwt = require("jsonwebtoken");
+require('dotenv').config();
 
-const SECRET_KEY = "27fab2ac4dfdee74fa836b7f25bbe464314f5d7a63b163bcaa3398233efb0bcf3a9e39890fe36f768aaf23ba29a7e76a87ff502ab03efb080cc78b2372dfae8b";
-
+const SECRET_KEY = process.env.JWT_SECRET || (() => {
+    throw new Error('JWT_SECRET must be defined in environment variables');
+})();
 
 function authenticateToken(req, res, next) {
     const authHeader = req.headers["authorization"];

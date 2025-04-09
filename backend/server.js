@@ -6,24 +6,28 @@ const bodyParser = require("body-parser");
 const multer = require("multer");
 const path = require("path");
 const bcrypt = require("bcrypt");
+require('dotenv').config();
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+
 const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "qwerty",
-  database: "retseptid_mysql",
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
 
 const SECRET_KEY =
-  "27fab2ac4dfdee74fa836b7f25bbe464314f5d7a63b163bcaa3398233efb0bcf3a9e39890fe36f768aaf23ba29a7e76a87ff502ab03efb080cc78b2372dfae8b";
-
+  process.env.JWT_SECRET ||
+  (() => {
+    throw new Error("JWT_SECRET must be defined in environment variables");
+  })();
+  
 const authenticateToken = (req, res, next) => {
- 
   const token =
     req.headers["authorization"] && req.headers["authorization"].split(" ")[1];
 
@@ -40,7 +44,7 @@ const authenticateToken = (req, res, next) => {
 
     req.user = user;
     console.log(req.user);
-    next(); 
+    next();
   });
 };
 
@@ -58,7 +62,7 @@ app.post("/login", (req, res) => {
       if (!passwordMatch) {
         return res.status(401).json({ message: "Invalid email or password" });
       }
-      // Generates a JWT token for the user
+      
       const token = jwt.sign({ id: user.id, email: user.email }, SECRET_KEY, {
         expiresIn: "1h",
       });
@@ -80,7 +84,7 @@ app.post("/sign-up", async (req, res) => {
   if (!email || !password) {
     return res
       .status(400)
-      
+
       .json({ message: "Email ja parool on kohustuslikud!" });
   }
 
@@ -165,7 +169,7 @@ async function generateUniqueUsername(baseUsername) {
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); 
+    cb(null, "uploads/");
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
@@ -222,10 +226,10 @@ app.get("/recipes", (req, res) => {
 
 app.post("/favorites/add", authenticateToken, (req, res) => {
   console.log("Received recipeId:", req.body.recipeId);
-  console.log("Received userId:", req.user?.id); 
-  
+  console.log("Received userId:", req.user?.id);
+
   const recipeId = req.body.recipeId;
-  const userId = req.user?.id; 
+  const userId = req.user?.id;
 
   if (!recipeId || !userId) {
     return res.status(400).json({ message: "Missing recipe ID or user ID" });
